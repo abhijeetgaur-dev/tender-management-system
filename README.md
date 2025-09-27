@@ -1,4 +1,4 @@
-## Tendeer Management System
+## Tender Management System
 
 Tender Management System is a web application for tender management. It is a web application for tender management. In Which one can manage their tender from creation to bidding to contract.
 
