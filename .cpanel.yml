@@ -1,52 +1,8 @@
----
-deployment:
+deploy:
   tasks:
-    - export APP_PATH=/home/piyush/public_html/repositories/tender-management-system
-    - export DOCROOT=/home/piyush/public_html
-
-    - cd $APP_PATH
-
-    # Install PHP dependencies if Composer exists on the server
-    - if command -v composer >/dev/null 2>&1; then composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader; fi
-
-    # Only create .env if missing (never overwrite secrets)
-    - if [ ! -f .env ] && [ -f .env.production ]; then cp .env.production .env; fi
-    - if [ ! -f .env ]; then touch .env; fi
-
-    # Generate APP_KEY once
-    - if ! grep -q '^APP_KEY=' .env || grep -q '^APP_KEY=$' .env; then php artisan key:generate --force; fi
-
-    # Build caches
-    - php artisan config:cache
-    - php artisan route:cache || true
-    - php artisan view:cache || true
-    - php artisan event:cache || true
-
-    # Ensure DOCROOT exists
-    - mkdir -p "$DOCROOT"
-
-    # Copy public/ (including .htaccess) into DOCROOT on every deploy
-    - /bin/cp -a $APP_PATH/public/. "$DOCROOT"/
-
-    # Make storage available from the web root as /storage
-    - ln -sfn $APP_PATH/storage/app/public "$DOCROOT"/storage
-
-    # Bootstrap Laravel from outside the web root
-    - |
-      cat > "$DOCROOT"/index.php <<'PHP'
-      <?php
-      define('LARAVEL_APP', realpath(__DIR__ . '/repositories/tender-management-system'));
-      require LARAVEL_APP . '/vendor/autoload.php';
-      $app = require_once LARAVEL_APP . '/bootstrap/app.php';
-      $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-      $response = $kernel->handle($request = Illuminate\Http\Request::capture());
-      $response->send();
-      $kernel->terminate($request, $response);
-      PHP
-
-    # Run DB migrations after code/assets are in place
-    - php artisan migrate --force
-
-    # Permissions
-    - find $APP_PATH/storage $APP_PATH/bootstrap/cache -type d -exec chmod 775 {} \;
-    - find $APP_PATH/storage $APP_PATH/bootstrap/cache -type f -exec chmod 664 {} \;
+    - export DEPLOY_DIR=/home/piyush/public_html/repositories/tms
+    - echo "Pulling latest code from GitHub..."
+    - cd $DEPLOY_DIR
+    - git reset --hard HEAD
+    - git pull origin main
+    - echo "Deployment complete!"
