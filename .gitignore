@@ -8,3 +8,6 @@ public/storage
 public/hot
 .qodo
 .vscode
+
+.htaccess
+.cpanel.yml
