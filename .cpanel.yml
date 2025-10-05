@@ -1,8 +1,11 @@
+---
 deploy:
   tasks:
-    - export DEPLOY_DIR=/home/piyush/public_html/repositories/tms
-    - echo "Pulling latest code from GitHub..."
-    - cd $DEPLOY_DIR
-    - git reset --hard HEAD
+    # Navigate to the repo
+    - cd /home/piyush/public_html/repositories/tms
+
+    # Pull latest code from GitHub via SSH (replace remote URL if needed)
     - git pull origin main
-    - echo "Deployment complete!"
+
+    # Finish
+    - echo "Deployment complete. Tracked files updated, .env and untracked files are safe."
