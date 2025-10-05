@@ -1,11 +1,20 @@
 ---
 deploy:
   tasks:
-    # Navigate to the repo
     - cd /home/piyush/public_html/repositories/tms
 
-    # Pull latest code from GitHub via SSH (replace remote URL if needed)
+    # Pull latest code from GitHub
     - git pull origin main
 
-    # Finish
-    - echo "Deployment complete. Tracked files updated, .env and untracked files are safe."
+    # Fix ownership and permissions after Git pull
+    - find /home/piyush/public_html/repositories/tms -type d -exec chmod 755 {} \;
+    - find /home/piyush/public_html/repositories/tms -type f -exec chmod 644 {} \;
+    - chown -R piyush:piyush /home/piyush/public_html/repositories/tms
+
+    # Optional: Laravel cache clearing if using Laravel
+    - if [ -f artisan ]; then php artisan config:clear; fi
+    - if [ -f artisan ]; then php artisan cache:clear; fi
+    - if [ -f artisan ]; then php artisan route:clear; fi
+    - if [ -f artisan ]; then php artisan view:clear; fi
+
+    - echo "Deployment complete, ownership and permissions fixed."
